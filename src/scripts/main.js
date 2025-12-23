@@ -3,28 +3,34 @@
 const tree = document.querySelector('.tree');
 
 tree.querySelectorAll('li').forEach((li) => {
-  const text = li.firstChild;
+  const nestedList = li.querySelector('ul');
 
-  if (text.nodeType !== Node.TEXT_NODE) {
+  if (!nestedList) {
+    return;
+  }
+
+  let textNode = null;
+
+  for (const node of li.childNodes) {
+    if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
+      textNode = node;
+      break;
+    }
+  }
+
+  if (!textNode) {
     return;
   }
 
   const span = document.createElement('span');
 
-  span.textContent = text.textContent.trim();
+  span.textContent = textNode.textContent.trim();
 
-  li.insertBefore(span, text);
-  li.removeChild(text);
-});
+  li.replaceChild(span, textNode);
 
-tree.addEventListener('click', (e) => {
-  if (e.target.tagName !== 'SPAN') {
-    return;
-  }
+  nestedList.hidden = true;
 
-  const ul = e.target.nextElementSibling;
-
-  if (ul) {
-    ul.hidden = !ul.hidden;
-  }
+  span.addEventListener('click', () => {
+    nestedList.hidden = !nestedList.hidden;
+  });
 });
